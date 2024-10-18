@@ -57,16 +57,15 @@ my_equ = hist_equ(gray_img)
 #############################################################
 ##                    Getting output                       ##
 #############################################################
-
-plt.hist(gray_img.flatten(),256,[0,256], color = 'r')
-plt.show()
-
-plt.hist(my_equ.flatten(),256,[0,256], color = 'r')
-plt.show()
-
-res = np.hstack((gray_img, my_equ)) #stacking images side-by-side
+res = np.hstack((equ_opencv, my_equ)) #stacking images side-by-side
 
 # plt.figure(figsize=(16, 16))
 plt.imshow(res, cmap='gray')
 
 plt.show() 
+
+#############################################################
+##          Computing difference between images            ##
+#############################################################
+max_diff = np.max(np.abs(my_equ - equ_opencv))
+print(max_diff)
