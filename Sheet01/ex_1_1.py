@@ -149,6 +149,11 @@ def apply_gaussian_filters(img):
     max_pixel_error = np.max(abs_diff)
     print(f"Maximum pixel error: {max_pixel_error}")
 
+def stackBlur(img, radius):
+    ksize = (radius, radius)
+    dst = cv.stackBlur(img, ksize)
+    return dst
+
 def add_salt_and_pepper_noise(img, noise_level=0.3):
     noisy_img = img.copy()
     num_salt = np.ceil(noise_level * img.size * 0.5)
@@ -164,6 +169,7 @@ def add_salt_and_pepper_noise(img, noise_level=0.3):
     
     return noisy_img
 
+
 def denoise_image(img):
     # Add salt and pepper noise
     noisy_img = add_salt_and_pepper_noise(img)
@@ -173,7 +179,7 @@ def denoise_image(img):
     gaussian_filtered = cv.GaussianBlur(noisy_img, (5, 5), 0)
     display_image("Gaussian Filtered", gaussian_filtered)
     
-    # Apply stack blur (assuming stackBlur is defined elsewhere)
+    # Apply stack blur
     stack_blurred = stackBlur(noisy_img, 5)
     display_image("Stack Blurred", stack_blurred)
     
@@ -190,11 +196,6 @@ def denoise_image(img):
         mean_val = np.mean(filtered_img)
         mean_distance = abs(mean_val - original_mean)
         print(f"Mean gray value distance for {filter_names[i]}: {mean_distance}")
-
-def stackBlur(img, radius):
-    # Placeholder implementation of stackBlur
-    # Replace this with the actual implementation
-    return cv.GaussianBlur(img, (radius, radius), 0)
 
 
 
