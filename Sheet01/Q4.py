@@ -12,7 +12,7 @@ img_path = 'bonn.png'
 img = cv.imread(img_path)
 
 gray_img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-display_image(gray_img)
+display_image("gray iamge", gray_img)
 
 #############################################################
 ##                   Using gaussianBlur                    ##
@@ -21,7 +21,7 @@ sigma = 2 * np.sqrt(2)
 blurred = cv.GaussianBlur(gray_img, (SIZE, SIZE), sigmaX=sigma)
 
 #############################################################
-#               implement getGaussianKernel                 #
+#      Using filter2D without using getGaussianKernel       #
 #############################################################
 def getGaussianKernel(size):
     mid = size/2
@@ -37,12 +37,26 @@ def getGaussianKernel(size):
     k /= np.sum(k)
     return k
 
-#############################################################
-#      Using filter2D without using getGaussianKernel       #
-#############################################################
-cv.filter2D(gray_img, -1, getGaussianKernel(SIZE))
+filtered = cv.filter2D(gray_img, -1, getGaussianKernel(SIZE))
+display_image("filtered without using getGaussianKernel", filtered)
 
 #############################################################
-#      Using sepFilter2D without using getGaussianKernel       #
+#     Using sepFilter2D without using getGaussianKernel     #
 #############################################################
-cv.sepFilter2D(gray_img, -1, getGaussianKernel(SIZE))
+def getGaussian1DKernel(size):
+    mid = size/2
+    k = np.zeros((size))
+
+    for i in range(size):        
+            x = i - mid            
+
+            k[i] = np.exp(-1 * (x**2) / (2 * sigma**2))
+
+    k /= np.sum(k)
+    return k
+
+kernelX = getGaussian1DKernel(SIZE)
+kernelY = getGaussian1DKernel(SIZE)
+
+sepFiltered = cv.sepFilter2D(gray_img, -1, kernelX, kernelY)
+display_image("sepFiltered without using getGaussianKernel", sepFiltered)
