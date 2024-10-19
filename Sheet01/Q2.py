@@ -2,6 +2,7 @@ import numpy as np
 import cv2 as cv
 from ex_1_1 import display_image
 import matplotlib.pyplot as plt
+from helper_methods import difference
 
 #####           Reading the image          #####
 img_path = 'bonn.png'
@@ -67,5 +68,4 @@ plt.show()
 #############################################################
 ##          Computing difference between images            ##
 #############################################################
-max_diff = np.max(np.abs(my_equ - equ_opencv))
-print(max_diff)
+print(difference(my_equ, equ_opencv))

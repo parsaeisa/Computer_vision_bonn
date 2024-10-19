@@ -2,6 +2,7 @@ import numpy as np
 import cv2 as cv
 from ex_1_1 import display_image
 import matplotlib.pyplot as plt
+from Sheet01.helper_methods import difference
 
 SIZE = 7
 
@@ -60,3 +61,10 @@ kernelY = getGaussian1DKernel(SIZE)
 
 sepFiltered = cv.sepFilter2D(gray_img, -1, kernelX, kernelY)
 display_image("sepFiltered without using getGaussianKernel", sepFiltered)
+
+#############################################################
+##          Computing difference between images            ##
+#############################################################
+print(difference(blurred, filtered))
+print(difference(blurred, sepFiltered))
+print(difference(sepFiltered, filtered))
