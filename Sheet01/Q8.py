@@ -1,8 +1,7 @@
 import numpy as np
 import cv2 as cv
 from helper_methods import difference
-from ex_1_1 import display_image
-
+import matplotlib.pyplot as plt
 SIZE = 7
 
 #############################################################
@@ -12,10 +11,9 @@ img_path = 'bonn.png'
 img = cv.imread(img_path)
 
 gray_img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-display_image("gray scaled image", gray_img)
 
 #############################################################
-##             Filter images with two kernels              ##
+##                    Defining kernels                     ##
 #############################################################
 kernel1 = np.array([
  [0.0113, 0.0838, 0.0113],
@@ -31,11 +29,11 @@ kernel2 = np.array([
  [1.6189, 1.5416, -0.2518, -0.8424,  0.1845],
 ], dtype=np.float64)
 
+#############################################################
+##             Filter images with two kernels              ##
+#############################################################
 filteredWithKernel1 = cv.filter2D(gray_img, -1, kernel1)
 filteredWithKernel2 = cv.filter2D(gray_img, -1, kernel2)
-
-display_image("filteredWithKernel1", filteredWithKernel1)
-# display_image("filteredWithKernel2", filteredWithKernel2)
 
 #############################################################
 ##          Use OpenCV SVD class with Kernel 1             ##
@@ -53,8 +51,6 @@ KernelY /= np.sum(KernelY)
 
 sepFilteredWithKernel1 = cv.sepFilter2D(gray_img, -1, KernelX, KernelY)
 
-display_image("used kernel1 with seperated filters", sepFilteredWithKernel1)
-
 #############################################################
 ##          Use OpenCV SVD class with Kernel 2             ##
 #############################################################
@@ -62,8 +58,6 @@ w2, u2, vt2 = cv.SVDecomp(kernel2)
 
 max_singular_value = w2.max()
 max_index = w2.argmax()
-
-print("w2: \n", w2, "\n")
 
 second_max_singular_value = np.partition(w2[:, 0], -2)[-2]
 second_max_index = np.where(w2[:, 0] == second_max_singular_value)[0]
@@ -80,12 +74,37 @@ KernelY1 /= np.sum(KernelY1)
 KernelX2 /= np.sum(KernelX2)
 KernelY2 /= np.sum(KernelY2)
 
-sepFilteredWithKernel2 = cv.sepFilter2D(gray_img, -1, KernelX1, KernelY1)
-sepFilteredWithKernel2 = cv.sepFilter2D(sepFilteredWithKernel2, -1, KernelX2, KernelY2)
+sepFilteredWithApprox1 = cv.sepFilter2D(gray_img, cv.CV_64F, KernelX1, KernelY1)
+sepFilteredWithApprox2 = cv.sepFilter2D(gray_img, cv.CV_64F, KernelX2, KernelY2)
 
-# display_image("used kernel2 with seperated filters", sepFilteredWithKernel)
+sepFilteredWithKernel2 = sepFilteredWithApprox1 + sepFilteredWithApprox2
+
+fig, axes = plt.subplots(2, 2, figsize=(10, 10))
+
+#############################################################
+###                   Displaying images                    ##
+#############################################################
+axes[0, 0].imshow(filteredWithKernel1)
+axes[0, 0].set_title('Filtered with Kernel 1')
+axes[0, 0].axis('off')  # Hide axis
+
+axes[0, 1].imshow(sepFilteredWithKernel1)
+axes[0, 1].set_title('SepFiltered with Kernel 1')
+axes[0, 1].axis('off')
+
+axes[1, 0].imshow(filteredWithKernel2)
+axes[1, 0].set_title('Filtered with Kernel 2')
+axes[1, 0].axis('off')
+
+axes[1, 1].imshow(sepFilteredWithKernel2)
+axes[1, 1].set_title('SepFiltered with Kernel 2')
+axes[1, 1].axis('off')
+
+# Display the images
+plt.show()
 
 #############################################################
 ##          Computing difference between images            ##
 #############################################################
-print(difference(filteredWithKernel1, sepFilteredWithKernel1))
+print("Difference between two ways with Kernel 1", difference(filteredWithKernel1, sepFilteredWithKernel1))
+print("Difference between two ways with Kernel 2", difference(filteredWithKernel2, sepFilteredWithKernel2))
