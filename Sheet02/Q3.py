@@ -1,9 +1,10 @@
 import cv2 as cv
+from helpers import display_image
 
-img_path = 'einstein.jpeg'
+img_path = 'data/einstein.jpeg'
 einstein_img = cv.imread(img_path)
 
-img_path = 'einstein_eye.jpeg'
+img_path = 'data/einstein_eye.jpeg'
 einstein_eye_img = cv.imread(img_path)
 
 def SSD(image):
