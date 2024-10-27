@@ -13,7 +13,7 @@ img_path = 'data/ronaldo.jpeg'
 ronaldo_img = cv.imread(img_path)
 
 #############################################################
-##                    Pyramid functions                    ##
+##                 Pyramid build functions                 ##
 #############################################################
 def build_gaussian_pyramid(image, levels):
     gaussian_pyramid = [image]
@@ -80,10 +80,8 @@ laplacian_pyramid2 = build_laplacian_pyramid(
 
 plt.show()
 
-# Combine the two Laplacian pyramids
 combined_laplacian_pyramid = combine_laplacian_pyramids(laplacian_pyramid1, laplacian_pyramid2)
 
-# Reconstruct the final blended image from the combined Laplacian pyramid
 blended_image = reconstruct(combined_laplacian_pyramid)
 
 display_image("blended image", blended_image)
