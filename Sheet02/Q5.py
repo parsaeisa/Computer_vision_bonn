@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 
 from helpers import display_image
 
+LEVELS_COUNT=5
+
 img_path = 'data/messi.jpg'
 messi_img = cv.imread(img_path)
 
@@ -20,9 +22,11 @@ def build_gaussian_pyramid(image, levels):
         gaussian_pyramid.append(image)
     return gaussian_pyramid
 
-def build_laplacian_pyramid(gaussian_pyramid):
+_, axarr = plt.subplots(LEVELS_COUNT-1,2, figsize=(10, 10))
+
+def build_laplacian_pyramid(gaussian_pyramid, plot_col):
     laplacian_pyramid = []
-    levels = len(gaussian_pyramid)
+    levels = len(gaussian_pyramid)    
 
     for i in range(levels - 1):        
         gaussian_expanded = cv.pyrUp(gaussian_pyramid[i + 1], dstsize=(gaussian_pyramid[i].shape[1], gaussian_pyramid[i].shape[0]))
@@ -30,16 +34,56 @@ def build_laplacian_pyramid(gaussian_pyramid):
         laplacian = cv.subtract(gaussian_pyramid[i], gaussian_expanded)
         laplacian_pyramid.append(laplacian)
 
+        # Plotting each level
+        axarr[i, plot_col].imshow(laplacian)
+        axarr[i, plot_col].set_title(f"level: {i}")
+        axarr[i, plot_col].axis('off')
+
     laplacian_pyramid.append(gaussian_pyramid[-1])
 
     return laplacian_pyramid
 
 #############################################################
-##                     Cropping images                     ##
+##                   Combining pyramids                    ##
 #############################################################
-messi_img_mid_width = messi_img.shape[1]//2
-left_part_messi_img = messi_img[:, :messi_img_mid_width]
+def combine_laplacian_pyramids(laplacian_pyramid1, laplacian_pyramid2):
+    combined_pyramid = []
+    
+    for lap1, lap2 in zip(laplacian_pyramid1, laplacian_pyramid2):
+        cols = lap1.shape[1]
+        laplacian_combined = np.hstack((lap1[:, :cols // 2], lap2[:, cols // 2:]))
+        combined_pyramid.append(laplacian_combined)
+        
+    return combined_pyramid
 
-ronaldo_img_mid_width = ronaldo_img.shape[1]//2
-right_part_ronaldo_img = ronaldo_img[:, ronaldo_img_mid_width:]
+#############################################################
+##                   Recostructing image                   ##
+#############################################################
+def reconstruct(laplacian_pyramid):    
+    reconstructed_image = laplacian_pyramid[-1]
+    
+    for level in range(len(laplacian_pyramid) - 2, -1, -1):
+        reconstructed_image = cv.pyrUp(reconstructed_image, dstsize=(laplacian_pyramid[level].shape[1], laplacian_pyramid[level].shape[0]))
+        reconstructed_image = cv.add(reconstructed_image, laplacian_pyramid[level])
+        
+    return reconstructed_image
 
+# Resizing ronaldo image to size (500, 500)
+ronaldo_img = cv.resize(ronaldo_img, (500, 500))
+
+laplacian_pyramid1 = build_laplacian_pyramid(
+        build_gaussian_pyramid(cv.cvtColor(messi_img, cv.COLOR_BGR2GRAY), LEVELS_COUNT), 0
+    )
+laplacian_pyramid2 = build_laplacian_pyramid(
+        build_gaussian_pyramid(cv.cvtColor(ronaldo_img, cv.COLOR_BGR2GRAY), LEVELS_COUNT), 1
+    )
+
+plt.show()
+
+# Combine the two Laplacian pyramids
+combined_laplacian_pyramid = combine_laplacian_pyramids(laplacian_pyramid1, laplacian_pyramid2)
+
+# Reconstruct the final blended image from the combined Laplacian pyramid
+blended_image = reconstruct(combined_laplacian_pyramid)
+
+display_image("blended image", blended_image)
