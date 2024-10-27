@@ -8,6 +8,9 @@ messi_img = cv.imread(img_path)
 img_path = 'data/ronaldo.jpeg'
 ronaldo_img = cv.imread(img_path)
 
+#############################################################
+##                    Pyramid functions                    ##
+#############################################################
 def build_gaussian_pyramid(image, levels):
     gaussian_pyramid = [image]
     for _ in range(levels - 1):
@@ -28,3 +31,13 @@ def build_laplacian_pyramid(gaussian_pyramid):
     laplacian_pyramid.append(gaussian_pyramid[-1])
 
     return laplacian_pyramid
+
+#############################################################
+##                     Cropping images                     ##
+#############################################################
+messi_img_mid_width = messi_img.shape[1]//2
+left_part_messi_img = messi_img[:, :messi_img_mid_width]
+
+ronaldo_img_mid_width = ronaldo_img.shape[1]//2
+right_part_ronaldo_img = ronaldo_img[:, ronaldo_img_mid_width:]
+
