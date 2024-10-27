@@ -1,6 +1,8 @@
 import cv2 as cv
-from helpers import display_image
+import numpy as np
 import matplotlib.pyplot as plt
+
+from helpers import display_image
 
 img_path = 'data/messi.jpg'
 messi_img = cv.imread(img_path)
