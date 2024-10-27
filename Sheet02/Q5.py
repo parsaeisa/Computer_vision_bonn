@@ -36,7 +36,7 @@ def build_laplacian_pyramid(gaussian_pyramid, plot_col):
 
         # Plotting each level
         axarr[i, plot_col].imshow(laplacian)
-        axarr[i, plot_col].set_title(f"level: {i}")
+        axarr[i, plot_col].set_title(f"level: {levels -i -1}")
         axarr[i, plot_col].axis('off')
 
     laplacian_pyramid.append(gaussian_pyramid[-1])
