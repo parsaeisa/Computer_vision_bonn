@@ -10,8 +10,27 @@ ronaldo_img = cv.imread(img_path)
 
 display_image("test", ronaldo_img)
 
-def build_gaussian_pyramid(image):
-    pass
+def build_gaussian_pyramid(image, levels):
+    gaussian_pyramid = [image]
+    for i in range(levels - 1):
+        image = cv.pyrDown(image)
+        gaussian_pyramid.append(image)
+    return gaussian_pyramid
 
-def build_laplacian_pyramid(image):
-    pass
+
+def build_laplacian_pyramid(gaussian_pyramid):
+    laplacian_pyramid = []
+    levels = len(gaussian_pyramid)
+
+    for i in range(levels - 1):
+        # Upsample the next level in the Gaussian pyramid
+        gaussian_expanded = cv.pyrUp(gaussian_pyramid[i + 1], dstsize=(gaussian_pyramid[i].shape[1], gaussian_pyramid[i].shape[0]))
+        
+        # Subtract to get the Laplacian level
+        laplacian = cv.subtract(gaussian_pyramid[i], gaussian_expanded)
+        laplacian_pyramid.append(laplacian)
+
+    # The last level is the same as the last Gaussian level
+    laplacian_pyramid.append(gaussian_pyramid[-1])
+
+    return laplacian_pyramid
