@@ -17,9 +17,20 @@ def distance_transform(binary_image):
     height, width = binary_image.shape
     dist_map = np.zeros_like(binary_image, dtype=float)
     
-    # TODO: Initialize distance map (set to inf for foreground, 0 for background)
+    # TODO: Initialize distance map (set to inf for foreground, 0 for background)    
+    # binary_image is as type boolean, The condition should be false or true?
+    B = np.argwhere(binary_image == False)
+    distance_map = np.zeros(binary_image.shape)
+
+    for x in range(height):
+        for y in range(width):
+            min_dist = np.min([
+                np.sqrt((x - i) ** 2 + (y - j) ** 2) for i, j in B
+                ])
+            distance_map[x, y] = min_dist        
     
     # TODO: Implement forward pass (top-left to bottom-right)
+    i_j_set = [(0,0), (0,1), (1,0), (1,1)]
     
     # TODO: Implement backward pass (bottom-right to top-left)
     
