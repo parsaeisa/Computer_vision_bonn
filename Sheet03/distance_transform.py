@@ -30,7 +30,15 @@ def distance_transform(binary_image):
             distance_map[x, y] = min_dist        
     
     # TODO: Implement forward pass (top-left to bottom-right)
-    i_j_set = [(0,0), (0,1), (1,0), (1,1)]
+    forward_pass_offsets  = [(0,-1), (-1,1), (-1,0), (-1,-1)]
+    forward_pass = np.zeros_like(binary_image)
+
+    for x in range(height):
+        for y in range(width):
+            forward_pass[x, y] = np.min([
+                distance_map[x + i, y + j] + np.sqrt(i**2 + j**2) for i, j in forward_pass_offsets
+            ])
+                
     
     # TODO: Implement backward pass (bottom-right to top-left)
     
