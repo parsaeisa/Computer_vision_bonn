@@ -41,6 +41,15 @@ def distance_transform(binary_image):
                 
     
     # TODO: Implement backward pass (bottom-right to top-left)
+    backward_pass_offsets  = [(1,-1), (1,0), (1,1), (0,1)]
+    backward_pass = np.zeros_like(binary_image)
+
+    for x in range(height-1, 0, -1):
+        for y in range(width-1, 0, -1):
+            backward_pass[x, y] = np.min(
+                forward_pass[x, y], 
+                np.min([forward_pass[x + i, y + j] + np.sqrt(i**2 + j**2) for i, j in backward_pass_offsets])
+            )
     
     return dist_map
 
