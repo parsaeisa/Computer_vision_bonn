@@ -28,15 +28,14 @@ def mean_shift_step(point, points, bandwidth):
         np.ndarray: New position after one step
     """
     # TODO: Implement single mean shift step
-    numerator, denominator = 0, 0
+    distances = np.linalg.norm(points - point, axis=1)
+    
+    weights = gaussian_kernel(distances, bandwidth)
+    
+    numerator = np.sum(weights[:, np.newaxis] * points, axis=0)
+    denominator = np.sum(weights)
 
-    for p in points:
-        gk = gaussian_kernel(((point - p)/bandwidth)**2, bandwidth)
-
-        numerator += gk * p        
-        denominator += gk
-
-    return numerator/denominator - point
+    return numerator / denominator
 
 def mean_shift_segmentation(image, bandwidth, max_iter=50):
     """
@@ -54,8 +53,21 @@ def mean_shift_segmentation(image, bandwidth, max_iter=50):
     # TODO: Implement convergence check
     # TODO: Create final segmentation
 
-    # This method should use other methods
-    pass
+    flat_image = image.reshape(-1, 3)
+    segmented_image = np.copy(flat_image)
+    
+    for i, point in enumerate(segmented_image):
+        for _ in range(max_iter):
+            new_position = mean_shift_step(point, flat_image, bandwidth)
+            
+            if np.linalg.norm(new_position - point) < 0.5:
+                break
+            
+            point = new_position
+        
+        segmented_image[i] = point
+
+    return segmented_image.reshape(image.shape)
 
 def normalize_image(image):
     # Convert the image to float to avoid integer division issues
@@ -85,7 +97,7 @@ def visualize(original, segmented, name):
     plt.savefig(name)
 
 if __name__ == "__main__":
-    bandwidth = 0 # SET PARAMETER
+    bandwidth = 0.5 # SET PARAMETER
     
     for i, name in enumerate(['simple', 'gradient', 'concentric']):
         original = np.load(f"test_images/task3/{name}.npy")
