@@ -36,7 +36,7 @@ def mean_shift_step(point, points, bandwidth):
         numerator += gk * p        
         denominator += gk
 
-    return numerator/denominator + point
+    return numerator/denominator - point
 
 def mean_shift_segmentation(image, bandwidth, max_iter=50):
     """
