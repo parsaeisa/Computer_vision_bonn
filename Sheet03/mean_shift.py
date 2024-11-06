@@ -13,7 +13,7 @@ def gaussian_kernel(distance, bandwidth):
         float: Kernel weight
     """
     # TODO: Implement Gaussian kernel
-    pass
+    return np.exp(-1 * distance / (2 * bandwidth**2))
 
 def mean_shift_step(point, points, bandwidth):
     """
@@ -28,7 +28,15 @@ def mean_shift_step(point, points, bandwidth):
         np.ndarray: New position after one step
     """
     # TODO: Implement single mean shift step
-    pass
+    numerator, denominator = 0, 0
+
+    for p in points:
+        gk = gaussian_kernel(((point - p)/bandwidth)**2, bandwidth)
+
+        numerator += gk * p        
+        denominator += gk
+
+    return numerator/denominator + point
 
 def mean_shift_segmentation(image, bandwidth, max_iter=50):
     """
@@ -45,6 +53,8 @@ def mean_shift_segmentation(image, bandwidth, max_iter=50):
     # TODO: Implement mean shift segmentation
     # TODO: Implement convergence check
     # TODO: Create final segmentation
+
+    # This method should use other methods
     pass
 
 def normalize_image(image):
