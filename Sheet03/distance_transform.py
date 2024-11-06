@@ -1,8 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from helpers import display_image
-
 def distance_transform(binary_image):
     """
     Compute the distance transform of a binary image using two-pass algorithm.
