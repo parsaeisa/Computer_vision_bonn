@@ -19,17 +19,13 @@ def plot_result(img, denoised_img, rho, pairwise_same, pairwise_diff, figsize=(1
     plt.show()
 
 def binary_img_denoiser(img, rho, pairwise_same, pairwise_diff):
-    # Convert to binary image (0 or 1)
     img = (img > 128).astype(np.uint8)
 
-    # Ensure the input image is binary
     assert np.array_equal(np.unique(img), [0, 1]), "Input image must be binary (0 or 1)."
 
-    # Define graph and add pixels as nodes
     graph = maxflow.Graph[int]()
     node_ids = graph.add_grid_nodes(img.shape)
 
-    # Add unary costs to the graph
     unary_cost_source = -np.log(rho) * img - np.log(1 - rho) * (1 - img)
     unary_cost_sink = -np.log(1 - rho) * img - np.log(rho) * (1 - img)
     graph.add_grid_tedges(node_ids, unary_cost_source, unary_cost_sink)
@@ -40,7 +36,6 @@ def binary_img_denoiser(img, rho, pairwise_same, pairwise_diff):
     graph.add_grid_edges(node_ids, structure=structure, weights=pairwise_same, symmetric=True)
     graph.add_grid_edges(node_ids, structure=np.ones_like(structure), weights=pairwise_diff, symmetric=True)
 
-    # Perform Maxflow optimization
     graph.maxflow()
 
     denoised_img = graph.get_grid_segments(node_ids).astype(np.float16)
