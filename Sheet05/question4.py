@@ -18,41 +18,41 @@ def plot_result(img, denoised_img, rho, pairwise_same, pairwise_diff, figsize=(1
     plt.savefig(f"result_question4.png")
     plt.show()
 
-
-
 def binary_img_denoiser(img, rho, pairwise_same, pairwise_diff):
-    # TODO: Change to binary image
-    img = ... # Binary image
+    # Convert to binary image (0 or 1)
+    img = (img > 128).astype(np.uint8)
 
     # Ensure the input image is binary
     assert np.array_equal(np.unique(img), [0, 1]), "Input image must be binary (0 or 1)."
 
-    # TODO: Define Graph and add pixels as nodes
+    # Define graph and add pixels as nodes
+    graph = maxflow.Graph[int]()
+    node_ids = graph.add_grid_nodes(img.shape)
 
+    # Add unary costs to the graph
+    unary_cost_source = -np.log(rho) * img - np.log(1 - rho) * (1 - img)
+    unary_cost_sink = -np.log(1 - rho) * img - np.log(rho) * (1 - img)
+    graph.add_grid_tedges(node_ids, unary_cost_source, unary_cost_sink)
 
-    # TODO: Add unary costs to the graph
+    structure = np.array([[0, 1, 0],
+                          [1, 0, 1],
+                          [0, 1, 0]], dtype=np.int32)
+    graph.add_grid_edges(node_ids, structure=structure, weights=pairwise_same, symmetric=True)
+    graph.add_grid_edges(node_ids, structure=np.ones_like(structure), weights=pairwise_diff, symmetric=True)
 
+    # Perform Maxflow optimization
+    graph.maxflow()
 
-    # TODO: Add pairwise costs to the graph
+    denoised_img = graph.get_grid_segments(node_ids).astype(np.float16)
 
-
-    # TODO: Perform Maxflow optimization
-
-
-    # TODO: Extract labels and construct the denoised image
-    denoised_img = np.zeros_like(img, dtype=np.uint8)
-    ...
-    
     return denoised_img
 
-
 if __name__ == "__main__":
-    # TODO: Read the noisy binary image
-    image = ... # File: './images/noisy_binary.png'
+    image = cv2.imread('./noisy_binary.png', cv2.IMREAD_GRAYSCALE)
 
-    rho = ... # Set parameter
-    pairwise_same = ... # Set parameter
-    pairwise_diff = ... # Set parameter
+    rho = 0.99
+    pairwise_same = 0.1
+    pairwise_diff = 1
 
     result = binary_img_denoiser(image, rho=rho, pairwise_same=pairwise_same, pairwise_diff=pairwise_diff)
 
