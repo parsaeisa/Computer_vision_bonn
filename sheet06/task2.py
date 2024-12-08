@@ -7,16 +7,6 @@ BOUNDING_BOX_X_START = 70
 BOUNDING_BOX_X_END = 280
 BOUNDING_BOX_Y_START = 30
 
-def display_image(window_name, img):
-    """
-    Displays image with given window name.
-    :param window_name: name of the window
-    :param img: image object to display
-    """
-    cv.imshow(window_name, img)
-    cv.waitKey(0)
-    cv.destroyAllWindows() 
-
 def pre_process_image(image):
     clipped_image = np.clip(image, CLIP_MARGIN, 255-CLIP_MARGIN)
     channels = cv.split(clipped_image)
@@ -34,8 +24,6 @@ def read_image(filename):
     bounding_box = np.zeros(image.shape)
     bounding_box[BOUNDING_BOX_Y_START:, BOUNDING_BOX_X_START:BOUNDING_BOX_X_END, :] = 1
     bb_width, bb_height = height - BOUNDING_BOX_Y_START, BOUNDING_BOX_X_END - BOUNDING_BOX_X_START
-
-    display_image("sdfadfa", image[BOUNDING_BOX_Y_START:, BOUNDING_BOX_X_START:BOUNDING_BOX_X_END, :])
 
     foreground = image[bounding_box == 1].reshape((bb_width * bb_height, 3))
     background = image[bounding_box == 0].reshape((height * width - bb_width * bb_height, 3))
@@ -95,23 +83,19 @@ class GMM:
         self.kmeans_init(data)
         self.em_algorithm(data)
 
-# Read the image
 image, foreground, background = read_image('person.jpg')
 
-# Train GMMs for foreground and background
 gmm_foreground = GMM(n_components=4)
 gmm_background = GMM(n_components=4)
 
 gmm_foreground.train(foreground)
 gmm_background.train(background)
 
-# Compute p(x|w=background) for each pixel
 height, width = image.shape[:2]
 data = image.reshape((-1, 3))
 background_probs = gmm_background.probability(data)
 
-# Threshold and display the resulting image
-tau = 0.15
+tau = 0.05
 mask = background_probs.reshape((height, width)) < tau
 result = image.copy()
 
