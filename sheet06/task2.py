@@ -91,13 +91,11 @@ gmm_background = GMM(n_components=4)
 gmm_foreground.train(foreground)
 gmm_background.train(background)
 
-height, width = image.shape[:2]
 data = image.reshape((-1, 3))
 background_probs = gmm_background.probability(data)
 
 tau = 0.05
-mask = background_probs.reshape((height, width)) < tau
-result = image.copy()
+mask = background_probs.reshape(image.shape[:2]) < tau
 
 output = np.ones_like(image, dtype=np.uint8) * 255
 
