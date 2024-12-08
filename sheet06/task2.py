@@ -105,11 +105,14 @@ data = image.reshape((-1, 3))
 background_probs = gmm_background.probability(data)
 
 # Threshold and display the resulting image
-tau = 0.3
+tau = 0.1
 mask = background_probs.reshape((height, width)) < tau
 result = image.copy()
-result[mask] = 0
 
-cv.imshow('Background Subtracted', result)
+output = np.ones_like(image, dtype=np.uint8) * 255
+
+output[mask == False] = 0
+
+cv.imshow('Background Subtracted', output)
 cv.waitKey(0)
 cv.destroyAllWindows()
