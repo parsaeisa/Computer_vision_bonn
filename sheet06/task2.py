@@ -2,6 +2,11 @@ import numpy as np
 import cv2 as cv
 from sklearn.cluster import KMeans
 
+CLIP_MARGIN = 25
+BOUNDING_BOX_X_START = 70
+BOUNDING_BOX_X_END = 280
+BOUNDING_BOX_Y_START = 30
+
 def display_image(window_name, img):
     """
     Displays image with given window name.
@@ -13,12 +18,10 @@ def display_image(window_name, img):
     cv.destroyAllWindows() 
 
 def pre_process_image(image):
-    clipped_image = np.clip(image, 25, 230)
+    clipped_image = np.clip(image, CLIP_MARGIN, 255-CLIP_MARGIN)
     channels = cv.split(clipped_image)
     equalized_channels = [cv.equalizeHist(ch) for ch in channels]
     equalized_image = cv.merge(equalized_channels)
-
-    # display_image("equalized hist", equalized_image)
 
     return equalized_image
 
@@ -29,8 +32,10 @@ def read_image(filename):
 
     height, width = image.shape[:2]
     bounding_box = np.zeros(image.shape)
-    bounding_box[30:, 70:280, :] = 1
-    bb_width, bb_height = 330, 210
+    bounding_box[BOUNDING_BOX_Y_START:, BOUNDING_BOX_X_START:BOUNDING_BOX_X_END, :] = 1
+    bb_width, bb_height = height - BOUNDING_BOX_Y_START, BOUNDING_BOX_X_END - BOUNDING_BOX_X_START
+
+    display_image("sdfadfa", image[BOUNDING_BOX_Y_START:, BOUNDING_BOX_X_START:BOUNDING_BOX_X_END, :])
 
     foreground = image[bounding_box == 1].reshape((bb_width * bb_height, 3))
     background = image[bounding_box == 0].reshape((height * width - bb_width * bb_height, 3))
@@ -106,7 +111,7 @@ data = image.reshape((-1, 3))
 background_probs = gmm_background.probability(data)
 
 # Threshold and display the resulting image
-tau = 0.1
+tau = 0.15
 mask = background_probs.reshape((height, width)) < tau
 result = image.copy()
 
