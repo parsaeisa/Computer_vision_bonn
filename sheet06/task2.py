@@ -26,10 +26,11 @@ def read_image(filename):
     image = cv.imread(filename)
     image = pre_process_image(image)
     image = image / 255
+
     height, width = image.shape[:2]
     bounding_box = np.zeros(image.shape)
-    bounding_box[20:, :370, :] = 1
-    bb_width, bb_height = 340, 370
+    bounding_box[30:, 70:280, :] = 1
+    bb_width, bb_height = 330, 210
 
     foreground = image[bounding_box == 1].reshape((bb_width * bb_height, 3))
     background = image[bounding_box == 0].reshape((height * width - bb_width * bb_height, 3))
