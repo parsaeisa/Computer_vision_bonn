@@ -42,14 +42,15 @@ class KalmanFilter:
         
     def update(self, measurement):
         # Kalman gain
-        S = self.phi @ self.P @ self.phi.T + self.R
+        S = self.phi @ self.P @ self.phi.T + self.R + np.eye(2) * 1e-6
         K = self.P @ self.phi.T @ np.linalg.inv(S)
         
         # Update state
         y = measurement - self.phi @ self.x
+        if np.isnan(y).any():
+            return self.x[:2]
+
         self.x = self.x + K @ y
-        
-        # Update covariance
         self.P = (np.eye(6) - K @ self.phi) @ self.P
         return self.x[:2]  # Return updated position
 
