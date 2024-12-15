@@ -9,12 +9,12 @@ class KalmanFilter:
         
         # State transition matrix
         self.psi = np.array([
-            [1, 0, dt, 0, dt**2/2, 0],
-            [0, 1, 0, dt, 0, dt**2/2],
-            [0, 0, 1, 0, dt, 0],
-            [0, 0, 0, 1, 0, dt],
-            [0, 0, 0, 0, 1, 0],
-            [0, 0, 0, 0, 0, 1]
+            [1, 0, dt, 0,  dt**2/2,  0],
+            [0, 1, 0,  dt, 0,       dt**2/2],
+            [0, 0, 1,  0,  dt,       0],
+            [0, 0, 0,  1,  0,       dt],
+            [0, 0, 0,  0,  1,        0],
+            [0, 0, 0,  0,  0,        1]
         ])
         
         # Measurement matrix
