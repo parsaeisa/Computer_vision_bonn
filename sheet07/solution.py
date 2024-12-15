@@ -53,6 +53,9 @@ class KalmanFilter:
         self.P = (np.eye(6) - K @ self.phi) @ self.P
         return self.x[:2]  # Return updated position
 
+class FixedLagSmoothing:
+    pass
+
 # Load observations
 observations = np.load('data/observations.npy')
 
