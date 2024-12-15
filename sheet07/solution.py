@@ -47,29 +47,6 @@ class FixedLagSmoothing:
         self.lag = lag
         self.kf = KalmanFilter(dt, sp, sm)
         self.state_history = []
-    
-    def smooth(self, observations):
-        smoothed_states = []
-        
-        for obs in observations:
-            self.kf.predict()
-            updated_state = self.kf.update(obs)
-            self.state_history.append([self.kf.x.copy(), self.kf.P.copy()])
-
-            if len(self.state_history) > self.lag:
-                self._perform_smoothing()
-                smoothed_states.append(self.state_history[0][0][:2])
-                self.state_history.pop(0)
-            
-            else:
-                smoothed_states.append(updated_state[:2])
-
-        while len(self.state_history) > 1:
-            self._perform_smoothing()
-            smoothed_states.append(self.state_history[0][0][:2])
-            self.state_history.pop(0)
-        
-        return smoothed_states
 
     def _perform_smoothing(self):
         """Perform fixed lag smoothing over the last two states in the history."""
@@ -109,7 +86,25 @@ plt.plot(filtered_states[:, 0], filtered_states[:, 1], 'b-', label='Filtered')
 ##############                          Fix lag smoothing                          ##############
 #################################################################################################
 smoother = FixedLagSmoothing(lag=30)
-smoothed_states = smoother.smooth(observations)
+smoothed_states = []
+
+for obs in observations:
+    smoother.kf.predict()
+    updated_state = smoother.kf.update(obs)
+    smoother.state_history.append([smoother.kf.x.copy(), smoother.kf.P.copy()])
+
+    if len(smoother.state_history) > smoother.lag:
+        smoother._perform_smoothing()
+        smoothed_states.append(smoother.state_history[0][0][:2])
+        smoother.state_history.pop(0)
+    
+    else:
+        smoothed_states.append(updated_state[:2])
+
+while len(smoother.state_history) > 1:
+    smoother._perform_smoothing()
+    smoothed_states.append(smoother.state_history[0][0][:2])
+    smoother.state_history.pop(0)
 
 for i, state in enumerate(smoothed_states):
     print(f"Time Step {i}: Smoothed State: {state}")
@@ -123,5 +118,5 @@ plt.plot(smoothed_states[:, 0], smoothed_states[:, 1], 'g-', label='Smoothed sta
 #################################################################################################
 plt.legend()
 plt.grid(True)
-plt.title('Observations vs. Filtered Estimates')
+plt.title('Observations vs. Filtered vs. Smoothed Estimates')
 plt.show()
