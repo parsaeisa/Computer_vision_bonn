@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 
 POINTS_COUNT = 56
 MAX_ITER = 1000
+ERROR_THRESH = 1e-5
 
 def read_data(file_path):
     data = np.loadtxt(file_path)
@@ -40,7 +41,7 @@ def compute_avg_error(kpts, mean_shape):
     return np.mean(errors)
 
 # ============================ Procrustres ===============================
-def procrustres_analysis(kpts, min_error=1e-5):
+def procrustres_analysis(kpts):
     aligned_kpts = kpts.copy()
 
     for iter in range(MAX_ITER):
@@ -52,7 +53,7 @@ def procrustres_analysis(kpts, min_error=1e-5):
 
         print(f"Iteration {iter + 1}: RMS Error = {avg_error}")
 
-        if avg_error < min_error:
+        if avg_error < ERROR_THRESH:
             print("Convergence reached.")
             break
 
