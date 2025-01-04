@@ -73,7 +73,6 @@ plt.figure(figsize=(12, 6))
 
 keypoints_transposed = keypoints.transpose(1, 0, 2)
 
-# Plot original shapes
 plt.subplot(1, 2, 1)
 for shape in keypoints_transposed:
     plt.plot(shape[:, 0], shape[:, 1], 'b-', alpha=0.3)
@@ -82,7 +81,6 @@ plt.gca().invert_yaxis()
 
 aligned_kpts_transposed = aligned_kpts.transpose(1, 0, 2)
 
-# Plot aligned shapes
 plt.subplot(1, 2, 2)
 for shape in aligned_kpts_transposed:
     plt.plot(shape[:, 0], shape[:, 1], 'g-', alpha=0.3)
